@@ -8,32 +8,39 @@ const TOKEN_EXPIRATION = "2h";
 
 router.post("/register", async (req, res) => {
   try {
-    const { email, password, confirmedPassword, firstName, lastName, phone } =
+    const { email, password, confirmPassword, firstName, lastName, phone } =
       req.body;
 
-    const existingUser = await admin.auth().getUserByEmail(email);
+    if (password !== confirmPassword) {
+      return res
+        .status(400)
+        .json({ confirmPassword: "Passwords do not match" });
+    }
 
-    if (existingUser) {
+    try {
+      await admin.auth().getUserByEmail(email);
       return res.status(400).json({ email: "Email is already in use" });
+    } catch (error) {
+      if (error.code === "auth/user-not-found") {
+        const userRecord = await admin.auth().createUser({
+          email,
+          password,
+        });
+
+        await db.collection("users").doc(userRecord.uid).set({
+          firstName,
+          lastName,
+          email,
+          phone,
+        });
+
+        return res
+          .status(201)
+          .json({ message: "User registered successfully" });
+      }
+      console.error("Error during registration:", error);
+      return res.status(500).json({ error: "Failed to register user" });
     }
-
-    if (password !== confirmedPassword) {
-      return res.status(400).json({ password: "Passwords do not match" });
-    }
-
-    const userRecord = await admin.auth().createUser({
-      email,
-      password,
-    });
-
-    await db.collection("users").doc(userRecord.uid).set({
-      firstName,
-      lastName,
-      email,
-      phone,
-    });
-
-    res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
     console.error("Error during registration:", error);
     res.status(500).json({ error: "Failed to register user" });
@@ -58,7 +65,7 @@ router.post("/login", async (req, res) => {
     res.status(200).json({ token });
   } catch (error) {
     console.error("Error during login:", error);
-    res.status(401).json({ error: "Authentication failed" });
+    res.status(401).json({ error: "Incorrect email or password" });
   }
 });
 

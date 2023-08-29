@@ -228,8 +228,11 @@ const Register = () => {
         </button>
         <p className="col-span-2 text-center text-lightGray">
           Already have an account?
-          <Link to="/signin" className="text-primary hover:text-darkPrimary">
-            Sign in
+          <Link
+            to="/login"
+            className="text-primary hover:text-darkPrimary ml-1"
+          >
+            Login
           </Link>
         </p>
       </form>
