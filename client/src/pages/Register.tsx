@@ -31,17 +31,12 @@ const Register = () => {
         body: JSON.stringify(values),
       });
 
+      const data = await response.json();
       if (response.ok) {
         console.log("Registration successful");
         navigate("/login");
-      } else {
-        const data = await response.json();
-        console.error(data.error || "An error occurred during registration");
-        if (data.fieldErrors) {
-          data.fieldErrors.forEach((error: any) => {
-            actions.setFieldError(error.field, error.message);
-          });
-        }
+      } else if (response.status === 400) {
+        actions.setFieldError("email", data.error);
       }
     } catch (error) {
       console.error("An error occurred during registration", error);

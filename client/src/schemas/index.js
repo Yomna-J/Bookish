@@ -31,7 +31,7 @@ export const registerSchema = yup.object().shape({
     .matches(/^\+?\d+$/, "Phone Number must contain only numbers")
     .min(10, "Phone Number must contain at least 10 characters")
     .max(15, "Phone Number must be at most 15 digits")
-    .required("Phone Number is required"),
+    .required("Required"),
 });
 
 export const signInSchema = yup.object().shape({
