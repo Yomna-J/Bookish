@@ -35,8 +35,11 @@ const Register = () => {
       if (response.ok) {
         console.log("Registration successful");
         navigate("/login");
-      } else if (response.status === 400) {
-        actions.setFieldError("email", data.error);
+      } else {
+        console.error(data.error || "An error occurred during registration");
+        Object.keys(data).forEach((field) => {
+          actions.setFieldError(field, data[field]);
+        });
       }
     } catch (error) {
       console.error("An error occurred during registration", error);
