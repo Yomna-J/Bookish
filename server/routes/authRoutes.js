@@ -8,8 +8,12 @@ const TOKEN_EXPIRATION = "2h";
 
 router.post("/register", async (req, res) => {
   try {
-    const { email, password, firstName, lastName } = req.body;
+    const { email, password, firstName, lastName, phone } = req.body;
 
+    const existingUser = await admin.auth().getUserByEmail(email);
+    if (existingUser) {
+      return res.status(400).json({ error: "Email is already in use" });
+    }
     const userRecord = await admin.auth().createUser({
       email,
       password,
@@ -19,6 +23,7 @@ router.post("/register", async (req, res) => {
       firstName,
       lastName,
       email,
+      phone,
     });
 
     res.status(201).json({ message: "User registered successfully" });

@@ -1,24 +1,17 @@
-import React from "react";
-import Hero from "./components/Hero";
-import RegistrationForm from "./pages/RegistrationForm";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
 
 const App: React.FC = () => {
-  const handleRegister = (
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string
-  ) => {
-    // Implement your registration logic here
-    console.log("Register:", email, password, firstName, lastName);
-  };
-
   return (
-    <div className="App">
-      <Hero />
-      <RegistrationForm onRegister={handleRegister} />
+    <div className="App text-darkGray">
+      <Router>
+        <Routes>
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </Router>
     </div>
   );
 };
-
 export default App;
