@@ -1,19 +1,14 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cors = require("cors");
+const authRoutes = require("./routes/authRoutes");
 
-const authRouter = require("./routes/authRoutes");
-const { app } = require("./firebase-config"); // Adjust the path if needed
+const app = express();
+const port = process.env.PORT || 5000;
 
-const server = express(); // Change variable name to 'server'
+app.use(bodyParser.json());
 
-server.use(cors());
-server.use(bodyParser.json());
+app.use("/api/auth", authRoutes);
 
-server.use("/api/auth", authRouter);
-
-const PORT = process.env.PORT || 5000;
-
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
