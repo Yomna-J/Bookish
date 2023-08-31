@@ -30,7 +30,6 @@ const Login = () => {
 
       const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
         const user = { token: data.token };
         setUser(user);
         navigate("/home", { replace: true });
