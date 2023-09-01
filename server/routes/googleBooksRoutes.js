@@ -2,21 +2,38 @@ const express = require("express");
 const router = express.Router();
 const fetch = require("node-fetch");
 
+const defaultThumbnail =
+  "https://i0.wp.com/roadmap-tech.com/wp-content/uploads/2019/04/placeholder-image.jpg?resize=400%2C400&ssl=1";
+
 router.get("/books", async (req, res) => {
+  const { category } = req.query;
+
   try {
-    const url = `https://www.googleapis.com/books/v1/volumes?q=query&startIndex=0&maxResults=30`;
+    const url = `https://www.googleapis.com/books/v1/volumes?q=${category}&startIndex=0&maxResults=30`;
     const response = await fetch(url);
     if (response.ok) {
       const data = await response.json();
       if (data && data.items) {
-        const resultsWithPrice = data.items.map((item) => {
-          const isbnObj = item.volumeInfo.industryIdentifiers?.find(
-            (identifier) => identifier.type === "ISBN_13"
+        const resultsWithThumbnail = data.items.map((item) => {
+          const thumbnail =
+            item.volumeInfo.imageLinks?.thumbnail || defaultThumbnail;
+          const priceString = calculatePrice(
+            item.volumeInfo.industryIdentifiers?.find(
+              (identifier) => identifier.type === "ISBN_13"
+            )?.identifier
           );
-          const price = calculatePrice(isbnObj?.identifier);
-          return { ...item, price };
+          const price = parseFloat(priceString);
+          return {
+            id: item.id,
+            title: item.volumeInfo.title,
+            authors: item.volumeInfo.authors,
+            averageRating: item.volumeInfo.averageRating,
+            ratingsCount: item.volumeInfo.ratingsCount,
+            thumbnail,
+            price,
+          };
         });
-        res.json(resultsWithPrice);
+        res.json(resultsWithThumbnail);
       }
     } else {
       console.error("Error:", response.status);
@@ -37,11 +54,23 @@ router.get("/book/:bookId", async (req, res) => {
     if (response.ok) {
       const data = await response.json();
       if (data) {
-        const isbnObj = data.volumeInfo.industryIdentifiers?.find(
-          (identifier) => identifier.type === "ISBN_13"
+        const thumbnail =
+          data.volumeInfo.imageLinks?.thumbnail || defaultThumbnail;
+        const priceString = calculatePrice(
+          data.volumeInfo.industryIdentifiers?.find(
+            (identifier) => identifier.type === "ISBN_13"
+          )?.identifier
         );
-        const price = calculatePrice(isbnObj?.identifier);
-        res.json({ ...data, price });
+        const price = parseFloat(priceString);
+        res.json({
+          id: data.id,
+          title: data.volumeInfo.title,
+          authors: data.volumeInfo.authors,
+          averageRating: data.volumeInfo.averageRating,
+          ratingsCount: data.volumeInfo.ratingsCount,
+          thumbnail,
+          price,
+        });
       }
     } else {
       console.error("Error:", response.status);
@@ -64,14 +93,26 @@ router.get("/search", async (req, res) => {
     if (response.ok) {
       const data = await response.json();
       if (data && data.items) {
-        const resultsWithPrice = data.items.map((item) => {
-          const isbnObj = item.volumeInfo.industryIdentifiers?.find(
-            (identifier) => identifier.type === "ISBN_13"
+        const resultsWithThumbnail = data.items.map((item) => {
+          const thumbnail =
+            item.volumeInfo.imageLinks?.thumbnail || defaultThumbnail;
+          const priceString = calculatePrice(
+            item.volumeInfo.industryIdentifiers?.find(
+              (identifier) => identifier.type === "ISBN_13"
+            )?.identifier
           );
-          const price = calculatePrice(isbnObj?.identifier);
-          return { ...item, price };
+          const price = parseFloat(priceString);
+          return {
+            id: item.id,
+            title: item.volumeInfo.title,
+            authors: item.volumeInfo.authors,
+            averageRating: item.volumeInfo.averageRating,
+            ratingsCount: item.volumeInfo.ratingsCount,
+            thumbnail,
+            price,
+          };
         });
-        res.json(resultsWithPrice);
+        res.json(resultsWithThumbnail);
       }
     } else {
       console.error("Error:", response.status);
