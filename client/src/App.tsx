@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 import SearchResults from "./pages/SearchResults";
 import { CartProvider } from "react-use-cart";
+import Account from "./pages/Account";
 
 const App: React.FC = () => {
   return (
@@ -19,6 +20,7 @@ const App: React.FC = () => {
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
               <Route path="/search" element={<SearchResults />} />
+              <Route path="/account" element={<Account />} />
             </Routes>
           </CartProvider>
         </AuthProvider>

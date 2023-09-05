@@ -60,7 +60,7 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between py-3 md:block md:py-5">
           <Link to="/">
             <h1 className="font-comfortaa text-4xl font-extrabold text-primary">
-              Obookia
+              Bookish
             </h1>
           </Link>
           <div className="md:hidden">
