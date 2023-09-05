@@ -32,7 +32,7 @@ const Login = () => {
       if (response.ok) {
         const user = { token: data.token };
         setUser(user);
-        navigate("/home", { replace: true });
+        navigate("/", { replace: true });
       } else if (response.status === 401) {
         actions.setFieldError("email", "Incorrect email or password");
         actions.setFieldError("password", "Incorrect email or password");
