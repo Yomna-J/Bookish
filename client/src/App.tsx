@@ -5,19 +5,22 @@ import { AuthProvider } from "./context/AuthContext";
 import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 import SearchResults from "./pages/SearchResults";
+import { CartProvider } from "react-use-cart";
 
 const App: React.FC = () => {
   return (
     <div className="App text-darkGray">
       <Router>
         <AuthProvider>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/search" element={<SearchResults />} />
-          </Routes>
+          <CartProvider>
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/search" element={<SearchResults />} />
+            </Routes>
+          </CartProvider>
         </AuthProvider>
       </Router>
     </div>
