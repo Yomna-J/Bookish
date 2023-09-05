@@ -37,7 +37,9 @@ const BookList: React.FC<{ category: string }> = ({ category }) => {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await fetch(`/api/books?category=${category}`);
+        const response = await fetch(
+          `http://localhost:5000/api/books?category=${category}`
+        );
         if (response.ok) {
           const data: Book[] = await response.json();
           setBooks(data);
