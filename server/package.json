@@ -1,6 +1,13 @@
 {
   "dependencies": {
+    "@babel/helper-compilation-targets": "^7.22.10",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "firebase": "^10.3.0"
+    "express": "^4.18.2",
+    "firebase": "^10.3.0",
+    "firebase-admin": "^11.10.1",
+    "jsonwebtoken": "^9.0.1",
+    "react-star-ratings": "^2.3.0"
   }
 }
