@@ -54,13 +54,9 @@ router.post("/login", async (req, res) => {
     const user = await admin.auth().getUserByEmail(email);
     await admin.auth().updateUser(user.uid, { password });
 
-    const token = jwt.sign(
-      { uid: user.uid, email: user.email },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: TOKEN_EXPIRATION,
-      }
-    );
+    const token = jwt.sign({ uid: user.uid }, process.env.JWT_SECRET, {
+      expiresIn: TOKEN_EXPIRATION,
+    });
 
     res.status(200).json({ token });
   } catch (error) {

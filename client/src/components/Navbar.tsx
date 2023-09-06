@@ -154,11 +154,11 @@ const Navbar: React.FC = () => {
                 Register
               </Link>
               <Link
-                to="/signin"
+                to="/login"
                 className="hover:text-primary"
                 onClick={closeNavbar}
               >
-                Sign in
+                Log in
               </Link>
             </>
           )}
@@ -180,7 +180,7 @@ const Navbar: React.FC = () => {
             {user?.token && (
               <button
                 className="flex gap-1  hover:text-primary  md:px-2"
-                onClick={() => {}}
+                onClick={() => navigate("/account", { replace: true })}
               >
                 Account
                 <RiAccountCircleFill className="text-2xl" />

@@ -12,40 +12,10 @@ type UserData = {
 
 const Account = () => {
   const { user } = useAuth();
-  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { emptyCart } = useCart();
   const [showLogoutWarning, setShowLogoutWarning] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      fetchUserDetails(user.token);
-    } else {
-      setLoading(false);
-    }
-  }, [user]);
-
-  const fetchUserDetails = async (token: string) => {
-    try {
-      const response = await fetch("http://localhost:5000/api/auth/user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch user data");
-      }
-
-      const userData = await response.json();
-      setUserData(userData);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-      setLoading(false);
-    }
-  };
 
   const handleLogout = async () => {};
 
@@ -73,7 +43,7 @@ const Account = () => {
               First Name
             </label>
             <input
-              value={userData?.firstName || ""}
+              value={user?.firstName || ""}
               id="firstName"
               type="text"
               readOnly
@@ -85,7 +55,7 @@ const Account = () => {
               Last Name
             </label>
             <input
-              value={userData?.lastName || ""}
+              value={user?.lastName || ""}
               id="lastName"
               type="text"
               readOnly
@@ -103,7 +73,7 @@ const Account = () => {
               Email Address
             </label>
             <input
-              value={userData?.email || ""}
+              value={user?.email || ""}
               id="email"
               type="text"
               readOnly
