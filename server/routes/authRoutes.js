@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
-const { admin, db } = require("../firebase-config");
+const { admin, db } = require("../config/firebase-config");
 
 const TOKEN_EXPIRATION = "2h";
 
