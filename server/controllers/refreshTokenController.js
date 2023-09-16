@@ -6,20 +6,19 @@ exports.handleRefreshToken = async (req, res) => {
   if (!cookies?.jwt) return res.sendStatus(401);
   const refreshToken = cookies.jwt;
 
-  //bring the user whoever has this refresh token
-
-  const foundUser = await db
+  const querySnapshot = await db
     .collection("users")
     .where("refreshToken", "==", refreshToken)
     .get();
 
-  if (!foundUser) return res.sendStatus(403); //Forbidden
-  // evaluate jwt
+  if (querySnapshot.empty) return res.sendStatus(403);
+  const foundUserDoc = querySnapshot.docs[0];
+
   jwt.verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET,
     (error, decoded) => {
-      if (error || foundUser.uid !== decoded.uid) return res.sendStatus(403);
+      if (error || foundUserDoc.id !== decoded.uid) return res.sendStatus(403);
 
       const accessToken = jwt.sign(
         { uid: decoded.uid },
