@@ -16,11 +16,17 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 
 // Routes
+
 app.use("/register", require("./routes/register"));
 app.use("/login", require("./routes/login"));
 app.use("/refresh", require("./routes/refresh"));
 app.use("/logout", require("./routes/logout"));
 
+app.use("/books", require("./routes/listBooks"));
+app.use("/book", require("./routes/getBook"));
+app.use("/search", require("./routes/searchBooks"));
+
+// Protected Routes
 app.use(verifyJWT);
 app.use("/user", require("./routes/user"));
 
