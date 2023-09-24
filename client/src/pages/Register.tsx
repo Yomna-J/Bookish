@@ -3,6 +3,7 @@ import { registerSchema } from "../schemas";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FormikHelpers } from "formik";
+import { baseURL } from "../api/api";
 
 type RegisterFormValues = {
   email: string;
@@ -13,6 +14,8 @@ type RegisterFormValues = {
   confirmPassword: string;
 };
 
+const REGISTER_URL = "/register";
+
 const Register = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -22,8 +25,9 @@ const Register = () => {
     actions: FormikHelpers<RegisterFormValues>
   ) => {
     setIsLoading(true);
+
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+      const response = await fetch(`${baseURL}${REGISTER_URL}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -31,20 +35,19 @@ const Register = () => {
         body: JSON.stringify(values),
       });
 
-      const data = await response.json();
-      if (response.ok) {
-        console.log("Registration successful");
-        navigate("/login");
-      } else {
-        console.error(data.error || "An error occurred during registration");
-        Object.keys(data).forEach((field) => {
-          actions.setFieldError(field, data[field]);
-        });
+      if (response.status === 201) {
+        navigate("/login", { replace: true });
+      } else if (response.status === 409) {
+        const responseData = await response.json();
+        if (responseData.email) {
+          setFieldError("email", responseData.email);
+        } else {
+          console.log("Unexpected response data:", responseData);
+        }
       }
     } catch (error) {
-      console.error("An error occurred during registration", error);
+      console.error("Network error:", error);
     } finally {
-      actions.setSubmitting(false);
       setIsLoading(false);
     }
   };

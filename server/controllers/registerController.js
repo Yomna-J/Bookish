@@ -13,7 +13,7 @@ exports.registerUser = async (req, res) => {
 
     try {
       await admin.auth().getUserByEmail(email);
-      return res.status(400).json({ email: "Email is already in use" });
+      return res.status(409).json({ email: "Email is already in use" });
     } catch (error) {
       if (error.code === "auth/user-not-found") {
         const userRecord = await admin.auth().createUser({
@@ -21,12 +21,16 @@ exports.registerUser = async (req, res) => {
           password,
         });
 
-        await db.collection("users").doc(userRecord.uid).set({
-          firstName,
-          lastName,
-          email,
-          phone,
-        });
+        await db
+          .collection("users")
+          .doc(userRecord.uid)
+          .set({
+            firstName,
+            lastName,
+            email,
+            phone,
+            cart: { items: [] },
+          });
 
         return res
           .status(201)
