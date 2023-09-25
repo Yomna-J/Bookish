@@ -1,4 +1,5 @@
 const { admin, db } = require("../config/firebase-config");
+const bcrypt = require("bcrypt");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -21,6 +22,8 @@ exports.registerUser = async (req, res) => {
           password,
         });
 
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         await db
           .collection("users")
           .doc(userRecord.uid)
@@ -29,6 +32,7 @@ exports.registerUser = async (req, res) => {
             lastName,
             email,
             phone,
+            hashedPassword,
             cart: { items: [] },
           });
 

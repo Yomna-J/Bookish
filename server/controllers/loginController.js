@@ -1,5 +1,6 @@
 const { db, admin } = require("../config/firebase-config");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const TOKEN_EXPIRATION = "2h";
 
@@ -7,21 +8,40 @@ exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await admin.auth().getUserByEmail(email);
-    await admin.auth().updateUser(user.uid, { password });
+    const user = await db
+      .collection("users")
+      .where("email", "==", email)
+      .limit(1)
+      .get();
+
+    if (user.empty) {
+      return res.status(401).json({ email: "Incorrect email or password" });
+    }
+
+    const userDoc = await admin.auth().getUserByEmail(email);
+
+    const userData = user.docs[0].data();
+    const hashedPassword = userData.hashedPassword;
+
+    const passwordMatch = await bcrypt.compare(password, hashedPassword);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ email: "Incorrect email or password" });
+    }
 
     const accessToken = jwt.sign(
-      { uid: user.uid },
+      { uid: userDoc.uid },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "30s" }
     );
+
     const refreshToken = jwt.sign(
-      { uid: user.uid },
+      { uid: userDoc.uid },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "1d" }
     );
 
-    await db.collection("users").doc(user.uid).update({
+    await db.collection("users").doc(userDoc.uid).update({
       refreshToken: refreshToken,
     });
 
@@ -35,6 +55,6 @@ exports.loginUser = async (req, res) => {
     res.json({ accessToken });
   } catch (error) {
     console.error("Error during login:", error);
-    res.status(401).json({ error: "Incorrect email or password" });
+    res.status(401).json({ email: "Incorrect email or password" });
   }
 };

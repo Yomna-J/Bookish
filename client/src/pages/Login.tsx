@@ -31,9 +31,12 @@ const Login = () => {
         credentials: "include",
         body: JSON.stringify(values),
       });
-
       console.log(response);
-      if (response.status === 201) {
+
+      if (response.status === 200) {
+        const responseData = await response.json();
+
+        setAuth({ email: values.email, accessToken: responseData.accessToken });
         navigate("/", { replace: true });
       } else if (response.status === 401) {
         const responseData = await response.json();
