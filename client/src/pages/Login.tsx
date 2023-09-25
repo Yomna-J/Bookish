@@ -1,18 +1,21 @@
 import { useFormik, FormikHelpers } from "formik";
 import { loginSchema } from "../schemas";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { baseURL } from "../api/api";
 
 type LoginFormValues = {
   email: string;
   password: string;
 };
 
+const LOGIN_URL = "/login";
+
 const Login = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const { setUser } = useAuth(); // Use setUser from the context
+  const { setAuth } = useAuth();
 
   const onSubmit = async (
     values: LoginFormValues,
@@ -20,25 +23,29 @@ const Login = () => {
   ) => {
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      const response = await fetch(`${baseURL}${LOGIN_URL}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(values),
       });
 
-      const data = await response.json();
-      if (response.ok) {
-        const user = { token: data.token };
-        setUser(user);
+      console.log(response);
+      if (response.status === 201) {
         navigate("/", { replace: true });
       } else if (response.status === 401) {
-        actions.setFieldError("email", "Incorrect email or password");
-        actions.setFieldError("password", "Incorrect email or password");
+        const responseData = await response.json();
+        if (responseData.email) {
+          setFieldError("email", responseData.email);
+          setFieldError("password", responseData.email);
+        } else {
+          console.log("Unexpected response data:", responseData);
+        }
       }
     } catch (error) {
-      console.error("An error occurred during login", error);
+      console.error("Network error:", error);
     } finally {
       actions.setSubmitting(false);
       setIsLoading(false);
@@ -52,6 +59,7 @@ const Login = () => {
     isSubmitting,
     handleBlur,
     handleChange,
+    setFieldError,
     handleSubmit,
   } = useFormik({
     initialValues: {
