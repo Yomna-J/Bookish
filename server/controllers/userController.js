@@ -3,7 +3,21 @@ const jwt = require("jsonwebtoken");
 
 exports.getUserDetails = async (req, res) => {
   try {
-    const uid = req.params.uid;
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).json({ error: "Authorization header missing" });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+    if (!decodedToken || !decodedToken.uid) {
+      return res.status(401).json({ error: "Invalid access token" });
+    }
+
+    const uid = decodedToken.uid;
 
     const userDoc = await db.collection("users").doc(uid).get();
 
@@ -13,6 +27,7 @@ exports.getUserDetails = async (req, res) => {
 
     const userData = userDoc.data();
     delete userData.refreshToken;
+    delete userData.hashedPassword;
 
     res.status(200).json(userData);
   } catch (error) {
