@@ -1,9 +1,10 @@
 import { useFormik } from "formik";
 import { registerSchema } from "../schemas";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FormikHelpers } from "formik";
 import axios from "../api/axios";
+import useAuth from "../context/AuthContext";
 
 type RegisterFormValues = {
   email: string;
@@ -19,6 +20,7 @@ const REGISTER_URL = "/register";
 const Register = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { auth } = useAuth();
 
   const onSubmit = async (
     values: RegisterFormValues,
@@ -74,6 +76,9 @@ const Register = () => {
     validationSchema: registerSchema,
     onSubmit,
   });
+  if (auth?.accessToken) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="mx-auto flex h-[90vh] flex-col items-center justify-center gap-12 px-4 py-12 lg:max-w-7xl">

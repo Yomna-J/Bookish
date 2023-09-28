@@ -18,20 +18,20 @@ const App: React.FC = () => {
         <CartProvider>
           <Routes>
             <Route path="/" element={<Layout />}>
-              {/* Public routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="register" element={<Register />} />
-              <Route path="login" element={<Login />} />
-              <Route path="search" element={<SearchResults />} />
-
-              {/* Protected routes */}
               <Route element={<PersistLogin />}>
+                {/* Public routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="register" element={<Register />} />
+                <Route path="login" element={<Login />} />
+                <Route path="search" element={<SearchResults />} />
+
+                {/* Protected routes */}
                 <Route element={<PrivateRoute />}>
                   <Route path="account" element={<Account />} />
                 </Route>
+                {/* catch all */}
+                {/* <Route path="*" element={<Missing />} /> */}
               </Route>
-              {/* catch all */}
-              {/* <Route path="*" element={<Missing />} /> */}
             </Route>
           </Routes>
         </CartProvider>
