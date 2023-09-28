@@ -1,6 +1,6 @@
 import { useFormik, FormikHelpers } from "formik";
 import { loginSchema } from "../schemas";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { useState } from "react";
 
 import useAuth from "../context/AuthContext";
@@ -18,7 +18,7 @@ const Login = () => {
   const from = location.state?.from?.pathname || "/";
 
   const [isLoading, setIsLoading] = useState(false);
-  const { setAuth } = useAuth();
+  const { auth, setAuth } = useAuth();
 
   const onSubmit = async (
     values: LoginFormValues,
@@ -73,7 +73,9 @@ const Login = () => {
     validationSchema: loginSchema,
     onSubmit,
   });
-
+  if (auth?.accessToken) {
+    return <Navigate to="/" replace />;
+  }
   return (
     <div className="mx-auto flex h-[90vh] flex-col items-center justify-center gap-12 px-4 py-12 lg:max-w-7xl">
       <h1 className="font-comfortaa text-4xl font-bold">Login</h1>

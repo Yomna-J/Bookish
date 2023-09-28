@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "react-use-cart";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import useLogout from "../hooks/useLogout";
 
 type User = {
   firstName: string;
@@ -20,7 +21,12 @@ const Account = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleLogout = async () => {};
+  const logout = useLogout();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+  };
 
   const handleCancelLogout = () => {
     setShowLogoutWarning(false);
