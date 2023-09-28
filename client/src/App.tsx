@@ -7,25 +7,36 @@ import Navbar from "./components/Navbar";
 import SearchResults from "./pages/SearchResults";
 import { CartProvider } from "react-use-cart";
 import Account from "./pages/Account";
+import Layout from "./components/Layout";
+import PrivateRoute from "./components/PrivateRoute";
+import PersistLogin from "./components/PersistLogin";
 
 const App: React.FC = () => {
   return (
-    <div className="App text-darkGray">
-      <Router>
-        <AuthProvider>
-          <CartProvider>
-            <Navbar />
-            <Routes>
+    <Router>
+      <AuthProvider>
+        <CartProvider>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              {/* Public routes */}
               <Route path="/" element={<Home />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/search" element={<SearchResults />} />
-              <Route path="/account" element={<Account />} />
-            </Routes>
-          </CartProvider>
-        </AuthProvider>
-      </Router>
-    </div>
+              <Route path="register" element={<Register />} />
+              <Route path="login" element={<Login />} />
+              <Route path="search" element={<SearchResults />} />
+
+              {/* Protected routes */}
+              <Route element={<PersistLogin />}>
+                <Route element={<PrivateRoute />}>
+                  <Route path="account" element={<Account />} />
+                </Route>
+              </Route>
+              {/* catch all */}
+              {/* <Route path="*" element={<Missing />} /> */}
+            </Route>
+          </Routes>
+        </CartProvider>
+      </AuthProvider>
+    </Router>
   );
 };
 export default App;

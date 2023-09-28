@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "react-use-cart";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
-type UserData = {
+type User = {
   firstName: string;
   lastName: string;
   email: string;
@@ -11,11 +11,14 @@ type UserData = {
 };
 
 const Account = () => {
-  const { user } = useAuth();
+  const [user, setUser] = useState<User | null>(null); // Initialize as null or with default user data if available
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
   const { emptyCart } = useCart();
   const [showLogoutWarning, setShowLogoutWarning] = useState(false);
+
+  const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {};
 
@@ -27,6 +30,30 @@ const Account = () => {
     setShowLogoutWarning(false);
     handleLogout();
   };
+
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const getUser = async () => {
+      try {
+        const response = await axiosPrivate.get("/user", {
+          signal: controller.signal,
+        });
+        isMounted && setUser(response.data);
+      } catch (err) {
+        console.error(err);
+        navigate("/login", { state: { from: location }, replace: true });
+      }
+    };
+
+    getUser();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, []);
 
   return (
     <div className="mx-auto flex flex-col items-center px-4 md:px-0 lg:max-w-7xl">
@@ -133,5 +160,4 @@ const Account = () => {
     </div>
   );
 };
-
 export default Account;

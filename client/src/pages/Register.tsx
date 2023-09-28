@@ -3,7 +3,7 @@ import { registerSchema } from "../schemas";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FormikHelpers } from "formik";
-import { baseURL } from "../api/api";
+import axios from "../api/axios";
 
 type RegisterFormValues = {
   email: string;
@@ -27,27 +27,27 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${baseURL}${REGISTER_URL}`, {
-        method: "POST",
+      const response = await axios.post(REGISTER_URL, values, {
+        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
-        body: JSON.stringify(values),
       });
 
       if (response.status === 201) {
         navigate("/login", { replace: true });
-      } else if (response.status === 409) {
-        const responseData = await response.json();
-        if (responseData.email) {
-          setFieldError("email", responseData.email);
-        } else {
-          console.log("Unexpected response data:", responseData);
+      }
+    } catch (error: any) {
+      if (error.response) {
+        if (error.response.status === 409) {
+          const responseData = error.response.data;
+          if (responseData.email) {
+            setFieldError("email", responseData.email);
+          } else {
+            console.log("Unexpected response data:", responseData);
+          }
         }
       }
-    } catch (error) {
-      console.error("Network error:", error);
     } finally {
       setIsLoading(false);
     }

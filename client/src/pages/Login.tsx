@@ -1,9 +1,10 @@
 import { useFormik, FormikHelpers } from "formik";
 import { loginSchema } from "../schemas";
-import { Link, useNavigate } from "react-router-dom";
-import { useContext, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { baseURL } from "../api/api";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
+
+import useAuth from "../context/AuthContext";
+import axios from "../api/axios";
 
 type LoginFormValues = {
   email: string;
@@ -11,9 +12,11 @@ type LoginFormValues = {
 };
 
 const LOGIN_URL = "/login";
-
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+
   const [isLoading, setIsLoading] = useState(false);
   const { setAuth } = useAuth();
 
@@ -22,33 +25,31 @@ const Login = () => {
     actions: FormikHelpers<LoginFormValues>
   ) => {
     setIsLoading(true);
+
     try {
-      const response = await fetch(`${baseURL}${LOGIN_URL}`, {
-        method: "POST",
+      const response = await axios.post(LOGIN_URL, values, {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
-        body: JSON.stringify(values),
+        withCredentials: true,
       });
-      console.log(response);
 
       if (response.status === 200) {
-        const responseData = await response.json();
-
+        const responseData = response.data;
         setAuth({ email: values.email, accessToken: responseData.accessToken });
-        navigate("/", { replace: true });
-      } else if (response.status === 401) {
-        const responseData = await response.json();
-        if (responseData.email) {
+        console.log(responseData.accessToken);
+        navigate(from, { replace: true });
+      } else {
+        console.log("Unexpected response data:", response.data);
+      }
+    } catch (error: any) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          const responseData = error.response.data;
           setFieldError("email", responseData.email);
           setFieldError("password", responseData.email);
-        } else {
-          console.log("Unexpected response data:", responseData);
         }
       }
-    } catch (error) {
-      console.error("Network error:", error);
     } finally {
       actions.setSubmitting(false);
       setIsLoading(false);
