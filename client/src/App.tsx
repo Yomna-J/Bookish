@@ -10,6 +10,7 @@ import Account from "./pages/Account";
 import Layout from "./components/Layout";
 import PrivateRoute from "./components/PrivateRoute";
 import PersistLogin from "./components/PersistLogin";
+import BookDetails from "./pages/BookDetails";
 
 const App: React.FC = () => {
   return (
@@ -24,6 +25,7 @@ const App: React.FC = () => {
                 <Route path="register" element={<Register />} />
                 <Route path="login" element={<Login />} />
                 <Route path="search" element={<SearchResults />} />
+                <Route path="/books/:bookId" element={<BookDetails />} />
 
                 {/* Protected routes */}
                 <Route element={<PrivateRoute />}>

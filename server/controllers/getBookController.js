@@ -24,6 +24,7 @@ exports.getBook = async (req, res) => {
           averageRating: data.volumeInfo.averageRating,
           ratingsCount: data.volumeInfo.ratingsCount,
           thumbnail,
+          description: data.volumeInfo.description,
           price,
         });
       }
