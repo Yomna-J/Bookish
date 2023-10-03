@@ -6,7 +6,7 @@ const TOKEN_EXPIRATION = "2h";
 
 exports.loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, cart } = req.body;
 
     const user = await db
       .collection("users")
@@ -29,6 +29,13 @@ exports.loginUser = async (req, res) => {
       return res.status(401).json({ email: "Incorrect email or password" });
     }
 
+    const mergedCartItems = mergeCarts(userData.cart, cart);
+
+    await db.collection("users").doc(userDoc.uid).update({
+      cart: mergedCartItems,
+    });
+
+    console.log("here", mergedCartItems);
     const accessToken = jwt.sign(
       { uid: userDoc.uid },
       process.env.ACCESS_TOKEN_SECRET,
@@ -58,3 +65,22 @@ exports.loginUser = async (req, res) => {
     res.status(401).json({ email: "Incorrect email or password" });
   }
 };
+// Helper function to merge two carts
+function mergeCarts(databaseCart, frontendCart) {
+  const mergedCart = Array.isArray(frontendCart.items)
+    ? [...frontendCart.items]
+    : [];
+
+  databaseCart.items.forEach((databaseItem) => {
+    const existingItem = mergedCart.find((item) => item.id === databaseItem.id);
+    if (existingItem) {
+      existingItem.quantity += databaseItem.quantity;
+    } else {
+      mergedCart.push(databaseItem);
+    }
+  });
+
+  return {
+    items: mergedCart,
+  };
+}
