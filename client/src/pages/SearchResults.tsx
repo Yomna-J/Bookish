@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import BookCard from "../components/BookCard";
+import BookCard from "../components/UI/BookCard";
 import { ToastContainer, toast } from "react-toastify";
 import { useCart } from "react-use-cart";
 

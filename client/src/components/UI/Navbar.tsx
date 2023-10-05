@@ -5,8 +5,8 @@ import { RiAccountCircleFill } from "react-icons/ri";
 import { FiShoppingCart } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "react-use-cart";
-import { searchSchema } from "../schemas";
-import useAuth from "../context/AuthContext";
+import { searchSchema } from "../../schemas";
+import useAuth from "../../context/AuthContext";
 
 const Navbar: React.FC = () => {
   const [navbar, setNavbar] = useState(false);

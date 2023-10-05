@@ -6,7 +6,7 @@ import { useCart } from "react-use-cart";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import { useMediaQuery } from "react-responsive";
-import axios from "../api/axios";
+import axios from "../../api/axios";
 
 type Book = {
   id: string;

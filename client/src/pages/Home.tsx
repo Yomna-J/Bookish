@@ -1,6 +1,6 @@
-import BookCard from "../components/BookCard";
-import BookList from "../components/BookList";
-import Hero from "../components/Hero";
+import BookCard from "../components/UI/BookCard";
+import BookList from "../components/UI/BookList";
+import Hero from "../components/UI/Hero";
 
 /* 
 
