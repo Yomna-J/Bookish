@@ -29,6 +29,7 @@ app.use("/search", require("./routes/searchBooks"));
 // Protected Routes
 app.use(verifyJWT);
 app.use("/user", require("./routes/user"));
+app.use("/cart", require("./routes/cart"));
 
 app.use((req, res) => {
   res.status(404).json({ error: "Not Found" });
