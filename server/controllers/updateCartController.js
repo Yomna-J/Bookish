@@ -1,7 +1,7 @@
 const { db } = require("../config/firebase-config");
 const jwt = require("jsonwebtoken");
 
-exports.getCart = async (req, res) => {
+exports.updateCart = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
 
@@ -18,22 +18,11 @@ exports.getCart = async (req, res) => {
     }
 
     const uid = decodedToken.uid;
+    await db.collection("users").doc(uid).update({ cart: req.body.cart });
 
-    const userDoc = await db.collection("users").doc(uid).get();
-
-    if (!userDoc.exists) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    const userData = userDoc.data();
-
-    if (userData && userData.cart) {
-      res.status(200).json(userData.cart);
-    } else {
-      res.status(404).json({ error: "Cart not found for this user" });
-    }
+    res.status(200).json({ message: "Cart replaced successfully" });
   } catch (error) {
-    console.error("Error fetching user's cart:", error);
+    console.error("Error replacing cart:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

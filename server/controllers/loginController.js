@@ -35,7 +35,6 @@ exports.loginUser = async (req, res) => {
       cart: mergedCartItems,
     });
 
-    console.log("here", mergedCartItems);
     const accessToken = jwt.sign(
       { uid: userDoc.uid },
       process.env.ACCESS_TOKEN_SECRET,
@@ -59,7 +58,7 @@ exports.loginUser = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    res.json({ accessToken });
+    res.json({ accessToken, cart: mergedCartItems });
   } catch (error) {
     console.error("Error during login:", error);
     res.status(401).json({ email: "Incorrect email or password" });

@@ -1,18 +1,44 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useCart } from "react-use-cart";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import emptyCart from "../assets/emptycart.svg";
 import CartItem from "../components/UI/CartItemn";
+import useAuth from "../context/AuthContext";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 const Cart = () => {
   const { isEmpty, totalItems, items, cartTotal } = useCart();
+  const { auth } = useAuth();
 
   const shippingCharges = 13.99;
   const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
-    // Update the Firebase cart whenever the items array changes
-  }, [items]);
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const updateCart = async () => {
+      try {
+        const cartData = {
+          cart: {
+            items: items,
+          },
+        };
+        await axiosPrivate.post("/update-cart", cartData);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (auth?.accessToken != null) {
+      updateCart();
+    }
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [totalItems]);
 
   const handleCheckout = async () => {
     //TODO: handle shipping charges
@@ -53,7 +79,6 @@ const Cart = () => {
               return <CartItem item={item} key={i} />;
             })}
         </div>
-        {/* THIS IS TAKING FULL HEIGHT */}
         <div className="flex h-72 flex-col justify-between rounded-lg border border-gray-100 p-4 shadow-md md:w-3/5">
           <h5 className="text-xl font-bold text-black">Order Summary</h5>
           <div>

@@ -1,10 +1,11 @@
 import { useFormik, FormikHelpers } from "formik";
 import { loginSchema } from "../schemas";
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import useAuth from "../context/AuthContext";
 import axios from "../api/axios";
+import { useCart } from "react-use-cart";
 
 type LoginFormValues = {
   email: string;
@@ -16,10 +17,10 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
+  const { items, setItems } = useCart();
 
   const [isLoading, setIsLoading] = useState(false);
   const { auth, setAuth } = useAuth();
-
   const onSubmit = async (
     values: LoginFormValues,
     actions: FormikHelpers<LoginFormValues>
@@ -27,17 +28,28 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(LOGIN_URL, values, {
-        headers: {
-          "Content-Type": "application/json",
+      const requestData = {
+        ...values,
+        cart: {
+          items: items, // Include the cart items here
         },
-        withCredentials: true,
-      });
+      };
+
+      const response = await axios.post(
+        LOGIN_URL,
+        JSON.stringify(requestData),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
 
       if (response.status === 200) {
         const responseData = response.data;
         setAuth({ email: values.email, accessToken: responseData.accessToken });
-        console.log(responseData.accessToken);
+        setItems(responseData.cart.items);
         navigate(from, { replace: true });
       } else {
         console.log("Unexpected response data:", response.data);

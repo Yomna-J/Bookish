@@ -30,6 +30,7 @@ app.use("/search", require("./routes/searchBooks"));
 app.use(verifyJWT);
 app.use("/user", require("./routes/user"));
 app.use("/cart", require("./routes/cart"));
+app.use("/update-cart", require("./routes/updateCart"));
 
 app.use((req, res) => {
   res.status(404).json({ error: "Not Found" });
