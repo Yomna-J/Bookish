@@ -5,12 +5,12 @@ import { RiAccountCircleFill } from "react-icons/ri";
 import { FiShoppingCart } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "react-use-cart";
-import { useAuth } from "../context/AuthContext"; // Import useAuth
-import { searchSchema } from "../schemas";
+import { searchSchema } from "../../schemas";
+import useAuth from "../../context/AuthContext";
 
 const Navbar: React.FC = () => {
   const [navbar, setNavbar] = useState(false);
-  const { user } = useAuth(); // Use useAuth here
+  const { auth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const searchQuery = new URLSearchParams(location.search).get("query");
@@ -60,7 +60,7 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between py-3 md:block md:py-5">
           <Link to="/">
             <h1 className="font-comfortaa text-4xl font-extrabold text-primary">
-              Obookia
+              Bookish
             </h1>
           </Link>
           <div className="md:hidden">
@@ -144,7 +144,7 @@ const Navbar: React.FC = () => {
             </div>
           </form>
 
-          {!user && (
+          {!auth?.accessToken && (
             <>
               <Link
                 to="/register"
@@ -154,15 +154,14 @@ const Navbar: React.FC = () => {
                 Register
               </Link>
               <Link
-                to="/signin"
+                to="/login"
                 className="hover:text-primary"
                 onClick={closeNavbar}
               >
-                Sign in
+                Log in
               </Link>
             </>
           )}
-
           <div className="flex flex-col gap-6 md:flex-row md:gap-3">
             <Link to="/cart" className=" hover:text-primary">
               <div className="flex gap-1 hover:cursor-pointer hover:text-primary  md:px-2">
@@ -177,10 +176,10 @@ const Navbar: React.FC = () => {
                 </span>
               </div>
             </Link>
-            {user?.token && (
+            {auth?.accessToken && (
               <button
                 className="flex gap-1  hover:text-primary  md:px-2"
-                onClick={() => {}}
+                onClick={() => navigate("/account", { replace: true })}
               >
                 Account
                 <RiAccountCircleFill className="text-2xl" />

@@ -1,44 +1,67 @@
 import { useFormik, FormikHelpers } from "formik";
 import { loginSchema } from "../schemas";
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+
+import useAuth from "../context/AuthContext";
+import axios from "../api/axios";
+import { useCart } from "react-use-cart";
 
 type LoginFormValues = {
   email: string;
   password: string;
 };
 
+const LOGIN_URL = "/login";
 const Login = () => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const { setUser } = useAuth(); // Use setUser from the context
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+  const { items, setItems } = useCart();
 
+  const [isLoading, setIsLoading] = useState(false);
+  const { auth, setAuth } = useAuth();
   const onSubmit = async (
     values: LoginFormValues,
     actions: FormikHelpers<LoginFormValues>
   ) => {
     setIsLoading(true);
-    try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
 
-      const data = await response.json();
-      if (response.ok) {
-        const user = { token: data.token };
-        setUser(user);
-        navigate("/", { replace: true });
-      } else if (response.status === 401) {
-        actions.setFieldError("email", "Incorrect email or password");
-        actions.setFieldError("password", "Incorrect email or password");
+    try {
+      const requestData = {
+        ...values,
+        cart: {
+          items: items, // Include the cart items here
+        },
+      };
+
+      const response = await axios.post(
+        LOGIN_URL,
+        JSON.stringify(requestData),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      if (response.status === 200) {
+        const responseData = response.data;
+        setAuth({ email: values.email, accessToken: responseData.accessToken });
+        setItems(responseData.cart.items);
+        navigate(from, { replace: true });
+      } else {
+        console.log("Unexpected response data:", response.data);
       }
-    } catch (error) {
-      console.error("An error occurred during login", error);
+    } catch (error: any) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          const responseData = error.response.data;
+          setFieldError("email", responseData.email);
+          setFieldError("password", responseData.email);
+        }
+      }
     } finally {
       actions.setSubmitting(false);
       setIsLoading(false);
@@ -52,6 +75,7 @@ const Login = () => {
     isSubmitting,
     handleBlur,
     handleChange,
+    setFieldError,
     handleSubmit,
   } = useFormik({
     initialValues: {
@@ -61,7 +85,9 @@ const Login = () => {
     validationSchema: loginSchema,
     onSubmit,
   });
-
+  if (auth?.accessToken) {
+    return <Navigate to="/" replace />;
+  }
   return (
     <div className="mx-auto flex h-[90vh] flex-col items-center justify-center gap-12 px-4 py-12 lg:max-w-7xl">
       <h1 className="font-comfortaa text-4xl font-bold">Login</h1>

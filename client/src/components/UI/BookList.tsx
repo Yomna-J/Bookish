@@ -6,6 +6,7 @@ import { useCart } from "react-use-cart";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import { useMediaQuery } from "react-responsive";
+import axios from "../../api/axios";
 
 type Book = {
   id: string;
@@ -37,12 +38,11 @@ const BookList: React.FC<{ category: string }> = ({ category }) => {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:5000/api/books?category=${category}`
+        const response = await axios.get(
+          `http://localhost:5000/books?category=${category}`
         );
-        if (response.ok) {
-          const data: Book[] = await response.json();
-          setBooks(data);
+        if (response.status === 200) {
+          setBooks(response.data);
         } else {
           console.error("Error:", response.status);
         }

@@ -1,8 +1,10 @@
 import { useFormik } from "formik";
 import { registerSchema } from "../schemas";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FormikHelpers } from "formik";
+import axios from "../api/axios";
+import useAuth from "../context/AuthContext";
 
 type RegisterFormValues = {
   email: string;
@@ -13,38 +15,42 @@ type RegisterFormValues = {
   confirmPassword: string;
 };
 
+const REGISTER_URL = "/register";
+
 const Register = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { auth } = useAuth();
 
   const onSubmit = async (
     values: RegisterFormValues,
     actions: FormikHelpers<RegisterFormValues>
   ) => {
     setIsLoading(true);
+
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
+      const response = await axios.post(REGISTER_URL, values, {
+        withCredentials: true,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
       });
 
-      const data = await response.json();
-      if (response.ok) {
-        console.log("Registration successful");
-        navigate("/login");
-      } else {
-        console.error(data.error || "An error occurred during registration");
-        Object.keys(data).forEach((field) => {
-          actions.setFieldError(field, data[field]);
-        });
+      if (response.status === 201) {
+        navigate("/login", { replace: true });
       }
-    } catch (error) {
-      console.error("An error occurred during registration", error);
+    } catch (error: any) {
+      if (error.response) {
+        if (error.response.status === 409) {
+          const responseData = error.response.data;
+          if (responseData.email) {
+            setFieldError("email", responseData.email);
+          } else {
+            console.log("Unexpected response data:", responseData);
+          }
+        }
+      }
     } finally {
-      actions.setSubmitting(false);
       setIsLoading(false);
     }
   };
@@ -70,6 +76,9 @@ const Register = () => {
     validationSchema: registerSchema,
     onSubmit,
   });
+  if (auth?.accessToken) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="mx-auto flex h-[90vh] flex-col items-center justify-center gap-12 px-4 py-12 lg:max-w-7xl">
