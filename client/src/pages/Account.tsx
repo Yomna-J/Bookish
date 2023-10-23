@@ -24,6 +24,7 @@ const Account = () => {
   const logout = useLogout();
 
   const handleLogout = async () => {
+    emptyCart();
     await logout();
     navigate("/");
   };
