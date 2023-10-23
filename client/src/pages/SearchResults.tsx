@@ -34,7 +34,7 @@ const SearchResults = () => {
 
       if (searchQuery) {
         const response = await fetch(
-          `http://localhost:5000/api/search?q=${searchQuery}`
+          `http://localhost:5000/search?q=${searchQuery}`
         ); // Replace with your actual backend API endpoint
         if (response.ok) {
           const data = await response.json();
