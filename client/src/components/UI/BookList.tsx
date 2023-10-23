@@ -7,6 +7,8 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import { useMediaQuery } from "react-responsive";
 import axios from "../../api/axios";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import useAuth from "../../context/AuthContext";
 
 type Book = {
   id: string;
@@ -20,7 +22,10 @@ type Book = {
 
 const BookList: React.FC<{ category: string }> = ({ category }) => {
   const [books, setBooks] = useState<Book[]>([]);
-  const { addItem } = useCart();
+  const { addItem, totalItems, items } = useCart();
+  const { auth } = useAuth();
+
+  const axiosPrivate = useAxiosPrivate();
 
   const handleAddToCart = (book: Book) => {
     addItem(book);
@@ -34,6 +39,45 @@ const BookList: React.FC<{ category: string }> = ({ category }) => {
       theme: "light",
     });
   };
+
+  const updateCart = async () => {
+    try {
+      const cartData = {
+        cart: {
+          items: items,
+        },
+      };
+      await axiosPrivate.post("/update-cart", cartData);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const updateCart = async () => {
+      try {
+        const cartData = {
+          cart: {
+            items: items,
+          },
+        };
+        await axiosPrivate.post("/update-cart", cartData);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (auth?.accessToken != null) {
+      updateCart();
+    }
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [totalItems]);
 
   useEffect(() => {
     const fetchBooks = async () => {
