@@ -11,6 +11,7 @@ import PersistLogin from "./components/PersistLogin";
 import BookDetails from "./pages/BookDetails";
 import Layout from "./components/UI/Layout";
 import Cart from "./pages/Cart";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
 
 const App: React.FC = () => {
   return (
@@ -31,6 +32,12 @@ const App: React.FC = () => {
                 {/* Protected routes */}
                 <Route element={<PrivateRoute />}>
                   <Route path="account" element={<Account />} />
+                </Route>
+                <Route element={<PrivateRoute />}>
+                  <Route
+                    path="checkout-success"
+                    element={<CheckoutSuccess />}
+                  />
                 </Route>
                 {/* catch all */}
                 {/* <Route path="*" element={<Missing />} /> */}

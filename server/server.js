@@ -25,12 +25,14 @@ app.use("/logout", require("./routes/logout"));
 app.use("/books", require("./routes/listBooks"));
 app.use("/book", require("./routes/getBook"));
 app.use("/search", require("./routes/searchBooks"));
+app.use("/verify-payment", require("./routes/verifyPayment"));
 
 // Protected Routes
 app.use(verifyJWT);
 app.use("/user", require("./routes/user"));
 app.use("/cart", require("./routes/cart"));
 app.use("/update-cart", require("./routes/updateCart"));
+app.use("/checkout", require("./routes/checkout"));
 
 app.use((req, res) => {
   res.status(404).json({ error: "Not Found" });
