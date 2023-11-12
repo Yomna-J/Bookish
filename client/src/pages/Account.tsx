@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "react-use-cart";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import useLogout from "../hooks/useLogout";
-
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 type User = {
   firstName: string;
   lastName: string;
@@ -68,61 +69,81 @@ const Account = () => {
 
       <div className="mb-4 w-full rounded-lg border border-gray-100 p-4 shadow-md md:w-[90%]">
         {/* Display user data here from 'userData' state */}
-        <h1 className="text-md my-1 font-bold">Personal Information</h1>
-        <hr />
+        {user ? (
+          <>
+            <h1 className="text-md my-1 font-bold">Personal Information</h1>
+            <hr />
 
-        <form className="my-3 mb-6 grid w-full grid-cols-2 gap-6">
-          <div className="col-span-2 md:col-auto">
-            <label htmlFor="firstName" className="block">
-              First Name
-            </label>
-            <input
-              value={user?.firstName || ""}
-              id="firstName"
-              type="text"
-              readOnly
-              className="w-full cursor-not-allowed rounded-md border bg-lightGrayBackground px-2 py-1"
-            />
+            <form className="my-3 mb-6 grid w-full grid-cols-2 gap-6">
+              {/* First Name */}
+              <div className="col-span-2 md:col-auto">
+                <label htmlFor="firstName" className="block">
+                  First Name
+                </label>
+                <input
+                  value={user.firstName || ""}
+                  id="firstName"
+                  type="text"
+                  readOnly
+                  className="w-full cursor-not-allowed rounded-md border bg-lightGrayBackground px-2 py-1"
+                />
+              </div>
+
+              {/* Last Name */}
+              <div className="col-span-2 md:col-auto">
+                <label htmlFor="lastName" className="block">
+                  Last Name
+                </label>
+                <input
+                  value={user.lastName || ""}
+                  id="lastName"
+                  type="text"
+                  readOnly
+                  className="w-full cursor-not-allowed rounded-md border bg-lightGrayBackground px-2 py-1"
+                />
+              </div>
+            </form>
+
+            <h1 className="text-md my-1 font-bold">Email Address</h1>
+            <hr />
+
+            <form className="my-3 grid w-full grid-cols-2 gap-6">
+              {/* Email Address */}
+              <div className="col-span-2">
+                <label htmlFor="email" className="block">
+                  Email Address
+                </label>
+                <input
+                  value={user.email || ""}
+                  id="email"
+                  type="text"
+                  readOnly
+                  className="w-full cursor-not-allowed rounded-md border bg-lightGrayBackground px-2 py-1"
+                />
+              </div>
+            </form>
+
+            <button
+              onClick={() => setShowLogoutWarning(true)}
+              className="mt-6 w-full rounded-md border bg-red-50 py-2 font-bold text-red-600"
+            >
+              Log Out
+            </button>
+          </>
+        ) : (
+          <div className="grid w-full grid-cols-2 gap-6">
+            <Skeleton height={20} />
+            <Skeleton height={20} />
+            <Skeleton height={20} />
+            <Skeleton height={20} />
+            <div className="col-span-2 ">
+              <Skeleton height={20} />
+              <Skeleton height={20} />
+            </div>
           </div>
-          <div className="col-span-2 md:col-auto">
-            <label htmlFor="lastName" className="block">
-              Last Name
-            </label>
-            <input
-              value={user?.lastName || ""}
-              id="lastName"
-              type="text"
-              readOnly
-              className="w-full cursor-not-allowed rounded-md border bg-lightGrayBackground px-2 py-1"
-            />
-          </div>
-        </form>
-
-        <h1 className="text-md my-1 font-bold">Email Address</h1>
-        <hr />
-
-        <form className="my-3 grid w-full grid-cols-2 gap-6">
-          <div className="col-span-2">
-            <label htmlFor="email" className="block">
-              Email Address
-            </label>
-            <input
-              value={user?.email || ""}
-              id="email"
-              type="text"
-              readOnly
-              className="w-full cursor-not-allowed rounded-md border bg-lightGrayBackground px-2 py-1"
-            />
-          </div>
-        </form>
-
-        <button
-          onClick={() => setShowLogoutWarning(true)}
-          className="mt-6 w-full rounded-md border bg-red-50 py-2 font-bold text-red-600"
-        >
-          Log Out
-        </button>
+        )}
       </div>
+
       {/* Logout Warning */}
       {showLogoutWarning && (
         <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">

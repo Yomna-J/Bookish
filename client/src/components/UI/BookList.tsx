@@ -9,6 +9,8 @@ import { useMediaQuery } from "react-responsive";
 import axios from "../../api/axios";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAuth from "../../context/AuthContext";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 type Book = {
   id: string;
@@ -38,19 +40,6 @@ const BookList: React.FC<{ category: string }> = ({ category }) => {
       progress: undefined,
       theme: "light",
     });
-  };
-
-  const updateCart = async () => {
-    try {
-      const cartData = {
-        cart: {
-          items: items,
-        },
-      };
-      await axiosPrivate.post("/update-cart", cartData);
-    } catch (err) {
-      console.error(err);
-    }
   };
 
   useEffect(() => {
@@ -132,17 +121,17 @@ const BookList: React.FC<{ category: string }> = ({ category }) => {
         itemClass="pr-4 my-4 mb-8"
         showDots={isDesktop ? true : false}
       >
-        {books.length > 0 ? (
-          books.map((book) => (
-            <BookCard
-              key={book.id}
-              book={book}
-              onClick={() => handleAddToCart(book)}
-            />
-          ))
-        ) : (
-          <p>No books available in this category.</p>
-        )}
+        {books.length > 0
+          ? books.map((book) => (
+              <BookCard
+                key={book.id}
+                book={book}
+                onClick={() => handleAddToCart(book)}
+              />
+            ))
+          : Array.from({ length: 5 }).map((_, index) => (
+              <Skeleton key={index} height={280} width={230} />
+            ))}
       </Carousel>
       <ToastContainer />
     </div>

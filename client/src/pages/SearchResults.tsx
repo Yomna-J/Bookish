@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { useCart } from "react-use-cart";
 import BookCard from "../components/UI/BookCard";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 type Book = {
   id: string;
@@ -19,7 +21,7 @@ const SearchResults = () => {
   const searchParams = new URLSearchParams(location.search);
   const searchQuery = searchParams.get("query");
   const { addItem } = useCart();
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -35,7 +37,7 @@ const SearchResults = () => {
       if (searchQuery) {
         const response = await fetch(
           `http://localhost:5000/search?q=${searchQuery}`
-        ); // Replace with your actual backend API endpoint
+        );
         if (response.ok) {
           const data = await response.json();
           setSearchResults(data);
@@ -73,8 +75,13 @@ const SearchResults = () => {
   return (
     <div className="mx-auto px-4 md:px-0 lg:max-w-7xl">
       <h1 className="my-7 text-2xl font-bold">Results</h1>
+
       {isLoading ? (
-        <p>Loading...</p>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 12 }).map((_, index) => (
+            <Skeleton key={index} height={300} width={290} />
+          ))}
+        </div>
       ) : searchResults.length > 0 ? (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3 lg:grid-cols-4">
           {searchResults.map((book: Book) => (
