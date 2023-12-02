@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useCart } from "react-use-cart";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import emptyCartImg from "../assets/emptycart.svg";
 import CartItem from "../components/UI/CartItem";
 import useAuth from "../context/AuthContext";
@@ -12,6 +12,7 @@ const Cart = () => {
 
   const shippingCharges = 13.99;
   const navigate = useNavigate();
+  const location = useLocation();
   const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
@@ -53,7 +54,7 @@ const Cart = () => {
         console.log("Error: Unable to create checkout session");
       }
     } catch (error) {
-      console.log(error);
+      navigate("/login");
     }
   };
 
@@ -109,7 +110,6 @@ const Cart = () => {
               <p>${(cartTotal + shippingCharges).toFixed(2)}</p>
             </div>
           </div>
-          {/* TODO: handle checkout for non-signed in users */}
           <button
             className="rounded-md bg-primary p-2 text-lg font-bold text-white hover:bg-darkPrimary"
             onClick={handleCheckout}
