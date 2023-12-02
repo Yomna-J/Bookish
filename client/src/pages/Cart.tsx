@@ -54,7 +54,7 @@ const Cart = () => {
         console.log("Error: Unable to create checkout session");
       }
     } catch (error) {
-      navigate("/login");
+      navigate("/login", { state: { from: location }, replace: true });
     }
   };
 
