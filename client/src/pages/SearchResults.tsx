@@ -35,7 +35,6 @@ const SearchResults = () => {
       setError(null);
 
       if (searchQuery) {
-        console.log(searchQuery);
         const response = await fetch(
           `http://localhost:5000/search?query=${searchQuery}`
         );

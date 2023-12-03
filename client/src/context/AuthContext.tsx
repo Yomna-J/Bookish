@@ -5,13 +5,11 @@ export type AuthState = {
   accessToken: string | null;
 };
 
-// Define the type for AuthContext
 type AuthContextType = {
   auth: AuthState | null;
   setAuth: (auth: AuthState | null) => void;
 };
 
-// Provide the AuthContextType as the generic parameter when creating the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -26,7 +24,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-// Export the useContext hook with AuthContext
 const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {

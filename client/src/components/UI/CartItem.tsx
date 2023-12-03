@@ -22,7 +22,6 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
   const { updateItemQuantity, removeItem } = useCart();
 
   return (
-    // TODO: Design this
     <div className="mb-4 rounded-lg border border-gray-100 p-4 shadow-md">
       <button
         className="float-right flex gap-1 hover:text-primary md:px-2"
