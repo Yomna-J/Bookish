@@ -31,8 +31,14 @@ const BookCard: React.FC<BookCardProps> = ({ book, onClick }) => {
         />
       </Link>
       <div className="flex grow flex-col justify-between p-5">
-        <h5 className="text-lg font-bold text-black">{book.title}</h5>
-        <h6 className="text-sm text-black">{book.authors?.join(", ")}</h6>
+        <h5 className="text-lg font-bold text-black max-h-6 overflow-hidden">
+          {book.title}
+        </h5>
+        <h6 className="text-sm text-black">
+          {book.authors?.length > 2
+            ? book.authors?.slice(0, 2).join(", ") + "..."
+            : book.authors?.join(", ")}
+        </h6>
         <div className="mt-2 mb-5 flex items-center justify-between">
           <p>
             <span className="text-lg text-black">${book.price}</span>

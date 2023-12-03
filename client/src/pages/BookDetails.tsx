@@ -6,6 +6,8 @@ import { useCart } from "react-use-cart";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "../api/axios";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 type Book = {
   id: string;
@@ -27,9 +29,7 @@ const BookDetails: React.FC = () => {
   useEffect(() => {
     const fetchBook = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5000/book?bookId=${bookId}`
-        );
+        const response = await axios.get(`/book?bookId=${bookId}`);
         if (response.status === 200) {
           setBook(response.data);
         } else {
@@ -63,7 +63,7 @@ const BookDetails: React.FC = () => {
 
   return (
     <div className="mx-auto flex flex-col items-center px-4 md:px-0 md:py-6 lg:max-w-7xl">
-      {book && (
+      {book ? (
         <div className="mb-4 flex w-full flex-col gap-6 rounded-lg border border-gray-100 p-4 shadow-md md:w-[90%] md:flex-row">
           <img
             className="w-1/2 self-center object-contain md:mt-6 md:w-[20%] md:self-start"
@@ -141,6 +141,10 @@ const BookDetails: React.FC = () => {
               Add to Cart
             </button>
           </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 w-full">
+          <Skeleton height={400} />
         </div>
       )}
       <ToastContainer />

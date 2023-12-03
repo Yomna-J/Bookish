@@ -7,6 +7,10 @@ import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import { useMediaQuery } from "react-responsive";
 import axios from "../../api/axios";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import useAuth from "../../context/AuthContext";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 type Book = {
   id: string;
@@ -20,7 +24,10 @@ type Book = {
 
 const BookList: React.FC<{ category: string }> = ({ category }) => {
   const [books, setBooks] = useState<Book[]>([]);
-  const { addItem } = useCart();
+  const { addItem, totalItems, items } = useCart();
+  const { auth } = useAuth();
+
+  const axiosPrivate = useAxiosPrivate();
 
   const handleAddToCart = (book: Book) => {
     addItem(book);
@@ -36,11 +43,35 @@ const BookList: React.FC<{ category: string }> = ({ category }) => {
   };
 
   useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const updateCart = async () => {
+      try {
+        const cartData = {
+          cart: {
+            items: items,
+          },
+        };
+        await axiosPrivate.post("/update-cart", cartData);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (auth?.accessToken != null) {
+      updateCart();
+    }
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [totalItems]);
+
+  useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5000/books?category=${category}`
-        );
+        const response = await axios.get(`/books?category=${category}`);
         if (response.status === 200) {
           setBooks(response.data);
         } else {
@@ -88,17 +119,17 @@ const BookList: React.FC<{ category: string }> = ({ category }) => {
         itemClass="pr-4 my-4 mb-8"
         showDots={isDesktop ? true : false}
       >
-        {books.length > 0 ? (
-          books.map((book) => (
-            <BookCard
-              key={book.id}
-              book={book}
-              onClick={() => handleAddToCart(book)}
-            />
-          ))
-        ) : (
-          <p>No books available in this category.</p>
-        )}
+        {books.length > 0
+          ? books.map((book) => (
+              <BookCard
+                key={book.id}
+                book={book}
+                onClick={() => handleAddToCart(book)}
+              />
+            ))
+          : Array.from({ length: 5 }).map((_, index) => (
+              <Skeleton key={index} height={280} width={230} />
+            ))}
       </Carousel>
       <ToastContainer />
     </div>

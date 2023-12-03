@@ -1,21 +1,21 @@
 import { useEffect } from "react";
 import { useCart } from "react-use-cart";
-import { useNavigate } from "react-router-dom";
-import emptyCart from "../assets/emptycart.svg";
-import CartItem from "../components/UI/CartItemn";
+import { useLocation, useNavigate } from "react-router-dom";
+import emptyCartImg from "../assets/emptycart.svg";
+import CartItem from "../components/UI/CartItem";
 import useAuth from "../context/AuthContext";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 const Cart = () => {
-  const { isEmpty, totalItems, items, cartTotal } = useCart();
+  const { isEmpty, totalItems, items, cartTotal, emptyCart } = useCart();
   const { auth } = useAuth();
 
   const shippingCharges = 13.99;
   const navigate = useNavigate();
+  const location = useLocation();
   const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
-    let isMounted = true;
     const controller = new AbortController();
 
     const updateCart = async () => {
@@ -35,21 +35,33 @@ const Cart = () => {
       updateCart();
     }
     return () => {
-      isMounted = false;
       controller.abort();
     };
   }, [totalItems]);
 
   const handleCheckout = async () => {
-    //TODO: handle shipping charges
-    //TODO: handle removing cart items after checkout
-    //TODO: style the checkout page
+    try {
+      const response = await axiosPrivate.post("/checkout", {
+        cartItems: items,
+      });
+
+      if (response.status === 200) {
+        const data = response.data;
+        if (data.url) {
+          window.location.href = data.url;
+        }
+      } else {
+        console.log("Error: Unable to create checkout session");
+      }
+    } catch (error) {
+      navigate("/login", { state: { from: location }, replace: true });
+    }
   };
 
   if (isEmpty)
     return (
       <div className="mx-auto flex h-[80vh] flex-col items-center justify-center px-4 md:px-0 lg:max-w-7xl">
-        <img src={emptyCart} alt="empty cart" className="md:w-1/2" />
+        <img src={emptyCartImg} alt="empty cart" className="md:w-1/2" />
         <h1 className="mb-3 text-2xl font-bold">Your cart is empty</h1>
         <button
           className="w-44 rounded-full bg-primary p-2 text-lg font-bold text-white hover:bg-darkPrimary"
@@ -98,7 +110,6 @@ const Cart = () => {
               <p>${(cartTotal + shippingCharges).toFixed(2)}</p>
             </div>
           </div>
-
           <button
             className="rounded-md bg-primary p-2 text-lg font-bold text-white hover:bg-darkPrimary"
             onClick={handleCheckout}
