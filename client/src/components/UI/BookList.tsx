@@ -71,9 +71,7 @@ const BookList: React.FC<{ category: string }> = ({ category }) => {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5000/books?category=${category}`
-        );
+        const response = await axios.get(`/books?category=${category}`);
         if (response.status === 200) {
           setBooks(response.data);
         } else {

@@ -29,9 +29,7 @@ const BookDetails: React.FC = () => {
   useEffect(() => {
     const fetchBook = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5000/book?bookId=${bookId}`
-        );
+        const response = await axios.get(`/book?bookId=${bookId}`);
         if (response.status === 200) {
           setBook(response.data);
         } else {

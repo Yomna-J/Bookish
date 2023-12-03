@@ -5,6 +5,7 @@ import { useCart } from "react-use-cart";
 import BookCard from "../components/UI/BookCard";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import BASE_URL from "../config";
 
 type Book = {
   id: string;
@@ -35,9 +36,7 @@ const SearchResults = () => {
       setError(null);
 
       if (searchQuery) {
-        const response = await fetch(
-          `http://localhost:5000/search?query=${searchQuery}`
-        );
+        const response = await fetch(`${BASE_URL}/search?query=${searchQuery}`);
         if (response.ok) {
           const data = await response.json();
           setSearchResults(data);
